@@ -49,7 +49,7 @@ function is_located_in_polygon( $coords, $lon, $lat ){
 
 	//It's definitely not inside the polygon if none of the edges has x coordinates which are 
         //respectively above the points x coordinate, respectively below...
-	//human: af all vertexes (points of polygon) are located above or below point (lon,lat)
+	//human: if all vertexes (points of polygon) are located above or below point (lon,lat)
 	//and the point is inside the polygon, if it has an even index, as descibed by
         //     http://en.wikipedia.org/wiki/Point_in_polygon
 	
