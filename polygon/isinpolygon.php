@@ -14,7 +14,7 @@ function is_located_in_polygon( $coords, $lon, $lat ){
 	$num = count( $coords );
 	//duplicate last coordinates for creating a circular list
 	$coords[$num] = $coords[0] ;
-	//fyi: circular list is only gone through once, after this, so no need for pointer etc.
+	//fyi: circular list is only gone through once, after this, so no need for pointers etc.
 	
 	//number of edges, 
 	$numleft = 0 ;
