@@ -4,7 +4,7 @@
 * Author: Hannes Van De Vreken
 * Params:
 * $coords should be an array, made out of associative arrays. For example: [{"lat":"3.5311423525","lon":"52.2342525"},{...}]
-*         all coordinates should be ordered, in order of appearance, based on the polygon that is descibed by those points
+*         all coordinates should be ordered, so that two consecutive points describe an edge of the polygon.
 * $lon = longitude of point, to be decided wether it's located in the polygon, defined by $coords
 * $lat = latitude of point, to be decided wether it's located in the polygon, defined by $coords
 */
