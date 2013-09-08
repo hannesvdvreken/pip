@@ -1,5 +1,6 @@
 Polygon tools
 ===
+[![Build Status](https://travis-ci.org/hannesvdvreken/pip.png?branch=master)](https://travis-ci.org/hannesvdvreken/pip)
 
 A [point-in-polygon algorithm](http://en.wikipedia.org/wiki/Point_in_polygon), centroid and orientation calculation, written in PHP. 
 Figure out (pun) if a point is actually inside a convex or concave polygon.
