@@ -9,30 +9,30 @@ Usage
 Initiate a Polygon object with coordinates as specified in [the GeoJSON Format](http://www.geojson.org/geojson-spec.html#polygon)
 
 ```PHP
-	use \Geometry\Polygon;
+use \Geometry\Polygon;
 
-    $poly = new Polygon($coords);
+$poly = new Polygon($coords);
 
-    $coords = $poly->get_outline();
-    $poly->set_outline($coords);
+$coords = $poly->get_outline();
+$poly->set_outline($coords);
 
-    $centroid = $poly->centroid();
-    echo "the centeroid of the polygon is ($centroid[0], $centroid[1]).\n";
+$centroid = $poly->centroid();
+echo "the centroid of the polygon is ($centroid[0], $centroid[1]).\n";
 
-    if ($poly->is_valid())
-    {
-        echo "the polygon was succesfully created.\n";
-    }
+if ($poly->is_valid())
+{
+    echo "the polygon was succesfully created.\n";
+}
 
-    if ( ! $poly->is_clockwise())
-    {
-        echo "the points define a counter-clockwise polygon.\n";
-    }
+if ( ! $poly->is_clockwise())
+{
+    echo "the points define a counter-clockwise polygon.\n";
+}
 
-    if ($poly->pip($x, $y))
-    {
-        echo "the polygon includes ($x,$y).\n";
-    }
+if ($poly->pip($x, $y))
+{
+    echo "the polygon includes ($x,$y).\n";
+}
 ```
 
 Origin
