@@ -3,9 +3,26 @@ namespace Geometry;
 
 class Polygon {
 
+	/**
+	 * The datapoints that define the polygon.
+	 *
+	 * @var array
+	 */
 	protected $coordinates;
+
+	/**
+	 * are the datapoints valid?
+	 *
+	 * @var boolean
+	 */
 	protected $valid;
 
+	/**
+	 * Create a new Polygon instance.
+	 *
+	 * @param array $coordinates
+	 * @return void
+	 */
 	public function __construct(array $coordinates = null)
 	{
 		if ($coordinates)
@@ -18,6 +35,12 @@ class Polygon {
 		}
 	}
 
+	/**
+	 * Re-use an instance and reset its outline points.
+	 *
+	 * @param array $coordinates
+	 * @return boolean
+	 */
 	public function set_outline($coordinates)
 	{
 		$points = array();
@@ -41,7 +64,7 @@ class Polygon {
 				{
 					$this->coordinates = array();
 					$this->valid = false;
-					return;
+					return false;
 				}
 			}
 		}
@@ -49,7 +72,7 @@ class Polygon {
 		{
 			$this->coordinates = array();
 			$this->valid = false;
-			return;
+			return false;
 		}
 
 		$first = reset($points);
@@ -63,18 +86,36 @@ class Polygon {
 
 		// assign
 		$this->coordinates = $points;
+		return true;
 	}
 
+	/**
+	 * Return the datapoints.
+	 *
+	 * @return array
+	 */
 	public function get_outline()
 	{
 		return $this->coordinates;
 	}
 
+	/**
+	 * Did the latest datapoints define a proper Polygon?
+	 *
+	 * @return boolean
+	 */
 	public function is_valid()
 	{
 		return $this->valid;
 	}
 
+	/**
+	 * Figure out if a given datapoint is inside the Polygon's outline.
+	 *
+	 * @param numeric $x
+	 * @param numeric $y
+	 * @return boolean
+	 */
 	public function pip($x, $y)
 	{
 		// init
@@ -112,6 +153,11 @@ class Polygon {
 		return $left * $right != 0 && abs($left - $right) % 2 == 0 ;
 	}
 
+	/**
+	 * In what direction do the datapoints define the outline?
+	 *
+	 * @return boolean
+	 */
 	public function is_clockwise()
 	{
 		// init
@@ -132,6 +178,12 @@ class Polygon {
 		return $sum >= 0;
 	}
 
+	/**
+	 * Calculate the Polygon's centroid.
+	 * http://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon
+	 * 
+	 * @return array
+	 */
 	public function centroid()
 	{
 		if ( ! $this->is_valid()) return false;
