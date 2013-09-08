@@ -1,7 +1,8 @@
-pip
+Polygon tools
 ===
 
-A point in polygon algorithm, written in php. Practical for finding out if a point is actually inside a convex or concave polygon. 
+A point-in-polygon algorithm, centroid and orientation calculation, written in php. Figure out (pun) if a point is actually inside a convex or concave polygon.
+
 
 Usage
 -----
