@@ -1,214 +1,204 @@
 <?php
 namespace Geometry;
 
-class Polygon {
+class Polygon
+{
+    /**
+     * @var array
+     */
+    protected $coordinates = [];
 
-	/**
-	 * The datapoints that define the polygon.
-	 *
-	 * @var array
-	 */
-	protected $coordinates;
+    /**
+     * @var bool
+     */
+    protected $valid;
 
-	/**
-	 * are the datapoints valid?
-	 *
-	 * @var boolean
-	 */
-	protected $valid;
+    /**
+     * @param array $coordinates
+     */
+    public function __construct(array $coordinates = null)
+    {
+        if ($coordinates) {
+            $this->setOutline($coordinates);
+        } else {
+            $this->valid = false;
+        }
+    }
 
-	/**
-	 * Create a new Polygon instance.
-	 *
-	 * @param array $coordinates
-	 * @return void
-	 */
-	public function __construct(array $coordinates = null)
-	{
-		if ($coordinates)
-		{
-			$this->set_outline($coordinates);
-		}
-		else
-		{
-			$this->valid = false;
-		}
-	}
+    /**
+     * @param array $coordinates
+     *
+     * @return $this
+     */
+    public function setOutline(array $coordinates)
+    {
+        $points = [];
+        $this->valid = true;
 
-	/**
-	 * Re-use an instance and reset its outline points.
-	 *
-	 * @param array $coordinates
-	 * @return boolean
-	 */
-	public function set_outline($coordinates)
-	{
-		$points = array();
-		$this->valid = true;
+        // Check if it has at least 3 points.
+        if (count($coordinates) >= 3) {
+            // Check format
+            foreach ($coordinates as $point) {
+                if ($this->validPoint($point)) {
+                    $points[] = $point;
+                } else {
+                    $this->valid = false;
+                    return $this;
+                }
+            }
+        } else {
+            $this->valid = false;
+            return $this;
+        }
 
-		// check
-		if (is_array($coordinates) && // must be array
-			count($coordinates) > 2 ) // at least 3 points
-		{
-			// check form
-			foreach ($coordinates as $point) 
-			{
-				if (is_array($point) &&
-					count($point) == 2 &&
-					is_numeric($point[0]) &&
-					is_numeric($point[1]))
-				{
-					$points[] = $point;
-				}
-				else
-				{
-					$this->coordinates = array();
-					$this->valid = false;
-					return false;
-				}
-			}
-		}
-		else
-		{
-			$this->coordinates = array();
-			$this->valid = false;
-			return false;
-		}
+        // Make sure the last one is the same as the first one.
+        if ($this->firstAndLastEqual($points)) {
+            $points[] = reset($points);
+        }
 
-		$first = reset($points);
-		$last = end($points);
+        // Assign.
+        $this->coordinates = $points;
+    }
 
-		if ($first[0] != $last[0] ||
-			$first[1] != $last[1])
-		{
-			$points[] = $first;
-		}
+    /**
+     * @return array
+     */
+    public function getOutline()
+    {
+        return $this->coordinates;
+    }
 
-		// assign
-		$this->coordinates = $points;
-		return true;
-	}
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->valid;
+    }
 
-	/**
-	 * Return the datapoints.
-	 *
-	 * @return array
-	 */
-	public function get_outline()
-	{
-		return $this->coordinates;
-	}
+    /**
+     * @param numeric $latitude
+     * @param numeric $longitude
+     *
+     * @return bool
+     */
+    public function pip($latitude, $longitude)
+    {
+        // init
+        $left = 0 ;
+        $right = 0 ;
+        $previous = reset($this->coordinates);
 
-	/**
-	 * Did the latest datapoints define a proper Polygon?
-	 *
-	 * @return boolean
-	 */
-	public function is_valid()
-	{
-		return $this->valid;
-	}
+        // calculate
+        while ($point = next($this->coordinates)) {
+            $x1 = $previous[0];
+            $y1 = $previous[1];
 
-	/**
-	 * Figure out if a given datapoint is inside the Polygon's outline.
-	 *
-	 * @param numeric $x
-	 * @param numeric $y
-	 * @return boolean
-	 */
-	public function pip($x, $y)
-	{
-		// init
-		$left = 0 ;
-		$right = 0 ;
-		$previous = null;
+            $x2 = $point[0];
+            $y2 = $point[1];
 
-		// calculate
-		foreach ($this->coordinates as &$point) 
-		{
-			if ($previous)
-			{
-				$x1 = $previous[0]; $y1 = $previous[1];
-				$x2 = $point[0];    $y2 = $point[1];
+            // If the edge is on the same height.
+            if (max($x2, $x1) >= $latitude && min($x2, $x1) < $latitude) {
+                // Change edge's direction if needed.
+                if ($x2 > $x1) {
+                    list($x1, $y1, $x2, $y2) = [$x2, $y2, $x1, $y1];
+                }
 
-				if( max( $x2 , $x1 ) > $x && min( $x2, $x1 ) < $y )
-				{
-					// change edge's direction
-					if( $x2 > $x1 )
-					{
-						list($x2, $x1) = array($x1, $x2);
-						list($y2, $y1) = array($y1, $y2);
-					}
+                // Check position relative to the edge.
+                $temp = ($x2 - $x1) * ($longitude - $y1) - ($y2 - $y1) * ($latitude - $x1);
+                $left += ($temp < 0) ? 1 : 0;
+            }
 
-					// check position
-					$temp = ($x2 - $x1) * ($x - $y1) - ($y2 - $y1) * ($y - $x1);
-					$left += ($temp <  0);
-					$right+= ($temp >= 0);
-				}
-			}
-			$previous = $point;
-		}
+            // Shift.
+            $previous = $point;
+        }
 
-		// return
-		return $left * $right != 0 && abs($left - $right) % 2 == 0 ;
-	}
+        // Return
+        return $left % 2 === 1;
+    }
 
-	/**
-	 * In what direction do the datapoints define the outline?
-	 *
-	 * @return boolean
-	 */
-	public function is_clockwise()
-	{
-		// init
-		$sum = 0;
-		$previous = null;
+    /**
+     * @return bool
+     */
+    public function isClockwise()
+    {
+        // Init
+        $sum = 0;
 
-		// calculate
-		foreach ($this->coordinates as &$point) 
-		{
-			if ($previous)
-			{
-				$sum += ($point[0] - $previous[0]) * ($point[1] + $previous[1]);
-			}
-			$previous = $point;
-		}
+        // Get the first.
+        $previous = reset($this->coordinates);
 
-		// return
-		return $sum >= 0;
-	}
+        // Loop.
+        while ($point = next($this->coordinates)) {
+            $sum += ($point[0] - $previous[0]) * ($point[1] + $previous[1]);
 
-	/**
-	 * Calculate the Polygon's centroid.
-	 * http://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon
-	 * 
-	 * @return array
-	 */
-	public function centroid()
-	{
-		if ( ! $this->is_valid()) return false;
+            // Shift
+            $previous = $point;
+        }
 
-		// init
-		$cx = 0;
-		$cy = 0;
-		$a  = 0;
-		$previous = null;
+        // Reset pointer.
+        reset($this->coordinates);
 
-		// calculate
-		foreach ($this->coordinates as &$point) 
-		{
-			if ($previous)
-			{
-				$temp = ($previous[0] * $point[1]) - ($point[0] * $previous[1]);
-				$cx += (($previous[0] + $point[0]) * $temp);
-				$cy += (($previous[1] + $point[1]) * $temp);
-				$a += $temp;
-			}
-			$previous = $point;
-		}
+        // Return.
+        return $sum >= 0;
+    }
 
-		// return
-		$a *= 3;
-		return array($cx / $a, $cy / $a);
-	}
+    /**
+     * @return array
+     */
+    public function centroid()
+    {
+        // Init
+        $cx = 0;
+        $cy = 0;
+        $a  = 0;
+
+        // First point.
+        $previous = reset($this->coordinates);
+
+        // Loop all points.
+        while ($point = next($this->coordinates)) {
+            $temp = ($previous[0] * $point[1]) - ($point[0] * $previous[1]);
+            $cx += (($previous[0] + $point[0]) * $temp);
+            $cy += (($previous[1] + $point[1]) * $temp);
+            $a += $temp * 3;
+
+            // Shift
+            $previous = $point;
+        }
+
+        // Reset the pointer.
+        reset($this->coordinates);
+
+        // Return the centroid.
+        return [$cx / $a, $cy / $a];
+    }
+
+    /**
+     * @param $point
+     *
+     * @return bool
+     */
+    protected function validPoint($point)
+    {
+        return is_array($point) &&
+            count($point) == 2 &&
+            is_numeric($point[0]) &&
+            is_numeric($point[1]);
+    }
+
+    /**
+     * @param array $points
+     *
+     * @return bool
+     */
+    protected function firstAndLastEqual(array $points)
+    {
+        // Get first and last.
+        $first = reset($points);
+        $last = end($points);
+
+        // Return if the first and the last are the same.
+        return $first[0] !== $last[0] || $first[1] !== $last[1];
+    }
 }
