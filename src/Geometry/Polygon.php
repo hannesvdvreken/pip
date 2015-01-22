@@ -77,16 +77,16 @@ class Polygon
     }
 
     /**
-     * @param numeric $latitude
-     * @param numeric $longitude
+     * @param double $latitude
+     * @param double $longitude
      *
      * @return bool
      */
     public function pip($latitude, $longitude)
     {
         // init
-        $left = 0 ;
-        $right = 0 ;
+        $left = 0;
+        $right = 0;
         $previous = reset($this->coordinates);
 
         // calculate
