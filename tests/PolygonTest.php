@@ -1,17 +1,18 @@
 <?php
-require __DIR__.'/../vendor/autoload.php';
-use Geometry\Polygon;
 
-class PolygonTest extends PHPUnit_Framework_TestCase
+use Geometry\Polygon;
+use PHPUnit\Framework\TestCase;
+
+class PolygonTest extends TestCase
 {
     public function testCreation()
     {
         // points
-        $points = array(
-            array(1, 3),
-            array(1.5, 3.5),
-            array(1.5, 2.5),
-        );
+        $points = [
+            [1, 3],
+            [1.5, 3.5],
+            [1.5, 2.5],
+        ];
 
         // not valid
         $p = new Polygon();

@@ -1,18 +1,21 @@
 language: php
+os: linux
+dist: xenial
 
-branches:
-  only:
-    - master
+matrix:
+  include:
+    - php: 5.6
+      env: VERSIONS=--prefer-lowest
+    - php: 7.0
+    - php: 7.1
+    - php: 7.2
+    - php: 7.3
+    - php: 7.4
 
-php:
-  - 5.6
-  - 7.0
-  - 7.1
-  - 7.2
-  - 7.3
-  - 7.4
+install:
+  - travis_retry composer self-update
+  - travis_retry composer install --no-interaction
+  - travis_retry composer update $VERSIONS
 
-before_script:
-   - composer install
-
-script: phpunit tests
+script:
+  - vendor/bin/phpunit tests
